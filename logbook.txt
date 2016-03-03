@@ -1,0 +1,46 @@
+In questa versione si mette un secondo higgs scalare piu' pesante.
+
+- Ricopiato phantom_1_2_6 con .obj dopo e rifatto .exe
+
+
+Le aggiunte/modifiche sono indicate con 
+* heavh
+....
+* heavhend
+
+oppure, per i ph 
+c heavh
+....
+c heavh
+
+FATTO
+
+- Modificato r.in e copiato in tools
+- Modificato readinput.f 
+   rmh negativo nessun higgs. per avere solo il piu' leggero rmhh < 0
+- Messo  ghhfactor  in COMMON/coupling_readinput/
+- Messo in common.h rmhh,rmhh2,gamhh e cmhh2 e i coupling rhhbb, etc.
+- In coupling.f definito rmhh2,gamhh e i coupling rhhbb, etc.
+
+
+
+DOMANDE ORA
+
+
+DA FARE 
+
+Da aggiunger accoppiamento  hh con 2 h e relativi diagrammi.
+
+Per ora gamhh negativa porta a gamhh calcolata come gamh*ghhfactor**2. Da 
+ aggiungere il decadimento di heavy higgs in due leggeri (hh -> h+h) come detto 
+ in readinput.f e r.in
+
+
+DOMANDE PER DOPO
+
+- Va esteso anche a coupling higgs a fermioni e bosoni con diverso
+  ghfactor e ghhfactor?
+
+- Va esteso anche a a_em^4 x a_s^2?  In questo casto bisogna prima
+estendere anche ghfactor che per ora vale solo per a_em^6 (vedi
+readinput a ghfactor) ?
