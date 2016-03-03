@@ -8,7 +8,7 @@
 #PDFLIBDIR = /home/phantom/phantom/lhapdf-5.2.2_intel_10/lib
 #PDFLIBDIR = /home/phantom/phantom/lhapdf-5.8.8_work/lib
 #PDFLIBDIR = /home/phantom/phantom/lhapdf-5.8.9/lhapdf/lib
-PDFLIBDIR = /afs/cern.ch/user/b/ballest/phantom/lhapdf-5.8.9_work/lib
+PDFLIBDIR = ${LHAPDF_DATA_PATH}/../../lib/
 
 #The following  definitions are to be used for compilation on alpha
 #  They must be commented for other compilers
