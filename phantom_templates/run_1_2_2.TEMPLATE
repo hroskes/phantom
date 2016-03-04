@@ -1,0 +1,11 @@
+#!/bin/csh
+
+cd FOLDER
+rm *.dat
+echo $HOSTNAME
+touch running
+date
+unbuffer /afs/cern.ch/user/g/govoni/work/PHANTOM/phantom_at_cern/phantom_1_2_2/phantom.exe
+
+mv running finished
+date
