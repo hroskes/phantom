@@ -10,6 +10,7 @@ import argparse
 import datetime
 import math
 
+dir = '/home-2/jroskes1@jhu.edu/work/heshy/phantom/phantom_1_2_8_nc/phantom_templates'
 
 
 def replaceParameterInFile (inputFile, outputFile, substitute): 
@@ -90,17 +91,17 @@ if __name__ == '__main__':
         getstatusoutput ('mkdir ' + args.folder)
         replaceParameterInFile (args.template, args.folder + '/r.in', substitute)
         
-        command = './setupdir2.pl -b /afs/cern.ch/user/g/govoni/work/PHANTOM/phantom_at_cern/phantom_1_2_5'
+        command = './setupdir2.pl -b '+dir
         if (args.Top != 'none') : 
             command += ' -T ' + args.Top
         command += ' -d ' + args.folder
         command += ' -t ' + args.folder + '/r.in'
-        command += ' -i "' + args.channel + '" -q ' + str (8 - len (args.channel.split ())) 
-        command += ' -s LSF -n ' + args.queue
+        command += ' -i "' + args.channel + '" -q ' + str (8 - len (args.channel.split ()))
+        command += ' -s SLURM -n ' + args.queue
 
         execute (command)
-        execute ('source ' + args.folder + '/LSFfile')
-        execute ('bj')
+        execute ('source ' + args.folder + '/SLURMfile')
+        execute ('squeue -u $USER -o "%.7i %.9P %.20j %.8u %.2t %.10M %.6D %R"')
     elif args.step == '2' :
         # generate the events
         # ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- 
@@ -126,7 +127,7 @@ if __name__ == '__main__':
             }
         replaceParameterInFile ('submit_step2.sh', 'gen_' + args.folder + '.sh', substitute_step2)
         execute ('source ./gen_' + args.folder + '.sh')
-        execute ('bj')
+        execute ('squeue -u $USER -o "%.7i %.9P %.20j %.8u %.2t %.10M %.6D %R"')
     elif args.step == '3' :
         # generate the events
         # ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- 
@@ -142,12 +143,12 @@ if __name__ == '__main__':
             print 'folder', gridFolder, 'does not exist, quitting'
             sys.exit (1)
         command = 'cd ' + gridFolder + '; grep SIGMA */run.out > res ; '
-        command += '/afs/cern.ch/user/g/govoni/work/PHANTOM/phantom_at_cern/phantom_1_2_5/tools/totint.exe > result '
+        command += dir+'/tools/totint.exe > result '
         print command
         execute (command)
                 
         command = 'cd ' + genFolder + '; grep -A 1 total\ integral gen*/run.o* > res ; '
-        command += '/afs/cern.ch/user/g/govoni/work/PHANTOM/phantom_at_cern/phantom_1_2_5/tools/gentotint.exe > result '
+        command += dir+'/gentotint.exe > result '
         print command
         execute (command)
         

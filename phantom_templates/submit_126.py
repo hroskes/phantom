@@ -99,7 +99,7 @@ if __name__ == '__main__':
 
         execute (command)
         execute ('source ' + args.folder + '/LSFfile')
-        execute ('bj')
+        execute ('squeue -u $USER -o "%.7i %.9P %.20j %.8u %.2t %.10M %.6D %R"')
     elif args.step == '2' :
         # generate the events
         # ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- 
@@ -125,7 +125,7 @@ if __name__ == '__main__':
             }
         replaceParameterInFile ('submit_step2_126.sh', 'gen_' + args.folder + '.sh', substitute_step2)
         execute ('source ./gen_' + args.folder + '.sh')
-        execute ('bj')
+        execute ('squeue -u $USER -o "%.7i %.9P %.20j %.8u %.2t %.10M %.6D %R"')
     elif args.step == '3' :
         # generate the events
         # ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- 

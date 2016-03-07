@@ -25,6 +25,7 @@ $Top_def="-1";
 $batch_def="slow";
 $VVscatt_def="false";
 $Hsig_def="false";
+$mail_def="$ENV{'USER'}";
 
 #INITIALIZATION TO GET RID OF WARNING MESSAGES
 $basedir="";
@@ -39,6 +40,7 @@ $batch="";
 $queue="";
 $VVscatt="";
 $Hsig="";
+$mail="";
 
 # PARSE COMMAND OPTIONS
 
@@ -53,7 +55,8 @@ while ( $_ = $ARGV[0]) {
         elsif (/^-q/)           { $quark = &get_option("-nquark");   }
         elsif (/^-T/)           { $Top = &get_option("-Top");   }
         elsif (/^-s/)           { $system = &get_option("-system");   }
-        elsif (/^-n/)           { $queue = &get_option("-batch");   }
+        elsif (/^-n/)           { $queue = &get_option("-name");   }
+        elsif (/^-m/)           { $mail = &get_option("-mail");   }
         elsif (/^-S/)           { $VVscatt="true"}
         elsif (/^-Hs/)          { $Hsig="true"}
 	elsif (/^-h/)		{ &usage("help")	} 
@@ -72,7 +75,7 @@ if ($inputstring eq ""){ $inputstring=$inputstring_def;}
 if ($quark eq ""){$quark=$quark_def;}
 if ($Top eq ""){$Top=$Top_def;}
 if ($system eq ""){die "\nERROR: The target batch system MUST be specified.
-Allowed values are:\nSGE: Torino\nLSF: Cern\nCONDOR: Condor\n";}
+Allowed values are:\nSGE: Torino\nLSF: Cern\nCONDOR: Condor\n\nSLURM: MARCC";}
 if ($VVscatt eq "") {$VVscatt=$VVscatt_def}
 if($Hsig eq "") {$Hsig=$Hsig_def}
 
@@ -104,7 +107,10 @@ elsif($system eq "LSF"){
 elsif($system eq "CONDOR"){
   $BATCHfilename = "CONDORfile";
   $runfilename = "condor.sub";}
-else{die "ERROR:Unallowed batch system. Valid entries are SGE LSF CONDOR"}
+elsif($system eq "SLURM"){
+  $BATCHfilename = "SLURMfile";
+  $runfilename = "run";}
+else{die "ERROR:Unallowed batch system. Valid entries are SGE LSF CONDOR SLURM"}
 
 # BASIC DEFINITIONS
 
@@ -737,6 +743,30 @@ if($system eq "SGE" || $system eq "LSF"){
     print WRITEFILE "date\n";
     close(WRITEFILE);
     }
+if($system eq "SLURM"){
+# create run file
+    open(WRITEFILE,"> $name/$runfilename");
+    print WRITEFILE "\#!/bin/csh\n\n";
+    print WRITEFILE "#SBATCH --job-name=$dirname\n";
+    print WRITEFILE "#SBATCH --time=48:0:0\n";
+    print WRITEFILE "#SBATCH --nodes=1\n";
+    print WRITEFILE "#SBATCH --ntasks-per-node=1\n";
+    print WRITEFILE "#SBATCH --partition=$queue\n";
+    print WRITEFILE "#SBATCH --mem=24000\n";
+    print WRITEFILE "#SBATCH --mail-type=end\n";
+    print WRITEFILE "#SBATCH --mail-user=$mail\n";
+    print WRITEFILE "\n";
+
+    print WRITEFILE "cd $dirtreeroot/$dirname\n";
+    print WRITEFILE "rm *.dat\n";
+    print WRITEFILE "echo \$HOSTNAME\n";
+    print WRITEFILE "touch running\n";
+    print WRITEFILE "date\n";
+    print WRITEFILE "unbuffer $basedir/$executefile\n";
+    print WRITEFILE "mv running finished\n";
+    print WRITEFILE "date\n";
+    close(WRITEFILE);
+    }
 elsif($system eq "CONDOR"){
 # create condor.sub file
     open(WRITEFILE,"> $name/$runfilename");
@@ -763,6 +793,11 @@ elsif($system eq "LSF"){
     print BATCHFILE "bsub -q $queue -u pippopluto -o $dirtreeroot/$dirname/$runfilename.out";
     print BATCHFILE " -J $dirname";
     print BATCHFILE " < $dirtreeroot/$dirname/$runfilename\n";
+    }
+elsif($system eq "SLURM"){
+    print BATCHFILE "sbatch -o $dirtreeroot/$dirname/$runfilename.out -e $dirtreeroot/$dirname/$runfilename.out";
+    print BATCHFILE " -J $dirname";
+    print BATCHFILE " $dirtreeroot/$dirname/$runfilename\n";
     }
 else{
     print BATCHFILE "condor_submit  $name/$runfilename\n";}
@@ -818,9 +853,13 @@ where options include:                                    Defaults -
                   SGE: Torino
                   LSF: Cern
                   CONDOR: condor
+                  SLURM: MARCC
     -name        name of the batch queue:
                   SGE: slow
                   LSF: 8nm, 8nh, 1nd, 2nd, 1nw, 2nw
+                  SLURM: shared
+    -mail        for SLURM, email address to send to when finished
+                  (default: $USER)
     -S            if this flag is present only processes which include
                   VV scattering diagrams are generated.
     -Hs           if this flag is present only processes which include
