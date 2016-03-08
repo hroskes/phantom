@@ -694,7 +694,7 @@ OLDPROC:    foreach $state (@in_state){
 # CREATE ROOT DIRECTORY OF THE TREE (If necessary)
 
 system("mkdir $dirtreeroot") unless -d $dirtreeroot;
-system("echo '*' > $dirtreeroot/.gitignore")
+system("echo '*' > $dirtreeroot/.gitignore");
 
 # CREATE BATCH SUBMISSION FILE
 
@@ -749,7 +749,6 @@ if($system eq "SLURM"){
 # create run file
     open(WRITEFILE,"> $name/$runfilename");
     print WRITEFILE "\#!/bin/bash\n\n";
-    print WRITEFILE "#SBATCH --job-name=$dirname\n";
     print WRITEFILE "#SBATCH --time=48:0:0\n";
     print WRITEFILE "#SBATCH --nodes=1\n";
     print WRITEFILE "#SBATCH --ntasks-per-node=1\n";
@@ -801,8 +800,11 @@ elsif($system eq "LSF"){
     print BATCHFILE " < $dirtreeroot/$dirname/$runfilename\n";
     }
 elsif($system eq "SLURM"){
+    $job_name = $dirtreeroot;
+    $job_name =~ s|.*/grid_||g;
+    $job_name = "${job_name}_${dirname}";
     print BATCHFILE "sbatch -o $dirtreeroot/$dirname/$runfilename.out -e $dirtreeroot/$dirname/$runfilename.out";
-    print BATCHFILE " -J $dirname";
+    print BATCHFILE " -J $job_name";
     print BATCHFILE " $dirtreeroot/$dirname/$runfilename\n";
     }
 else{
