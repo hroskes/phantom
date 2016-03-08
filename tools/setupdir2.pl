@@ -78,6 +78,7 @@ if ($system eq ""){die "\nERROR: The target batch system MUST be specified.
 Allowed values are:\nSGE: Torino\nLSF: Cern\nCONDOR: Condor\n\nSLURM: MARCC";}
 if ($VVscatt eq "") {$VVscatt=$VVscatt_def}
 if($Hsig eq "") {$Hsig=$Hsig_def}
+if($mail eq "") {$mail=$mail_def}
 
 # check that $quark is an even integer
 if ( $quark !~ /\d+/  || $quark>10 || $quark !~/2|4|6|8|10/ ) {
@@ -693,6 +694,7 @@ OLDPROC:    foreach $state (@in_state){
 # CREATE ROOT DIRECTORY OF THE TREE (If necessary)
 
 system("mkdir $dirtreeroot") unless -d $dirtreeroot;
+system("echo '*' > $dirtreeroot/.gitignore")
 
 # CREATE BATCH SUBMISSION FILE
 
@@ -746,17 +748,21 @@ if($system eq "SGE" || $system eq "LSF"){
 if($system eq "SLURM"){
 # create run file
     open(WRITEFILE,"> $name/$runfilename");
-    print WRITEFILE "\#!/bin/csh\n\n";
+    print WRITEFILE "\#!/bin/bash\n\n";
     print WRITEFILE "#SBATCH --job-name=$dirname\n";
     print WRITEFILE "#SBATCH --time=48:0:0\n";
     print WRITEFILE "#SBATCH --nodes=1\n";
     print WRITEFILE "#SBATCH --ntasks-per-node=1\n";
     print WRITEFILE "#SBATCH --partition=$queue\n";
-    print WRITEFILE "#SBATCH --mem=24000\n";
+    print WRITEFILE "#SBATCH --mem=5000\n";
     print WRITEFILE "#SBATCH --mail-type=end\n";
     print WRITEFILE "#SBATCH --mail-user=$mail\n";
+    print WRITEFILE "#SBATCH --dependency=singleton\n";
     print WRITEFILE "\n";
 
+    print WRITEFILE "cd $ENV{'CMSSW_DATA_PATH'}\n";
+    print WRITEFILE "eval \$(scram ru -sh)\n";
+    print WRITEFILE "export LHAPDF_DATA_PATH=/work-zfs/lhc/installations/LHAPDF-6.1.5/share/LHAPDF\n";
     print WRITEFILE "cd $dirtreeroot/$dirname\n";
     print WRITEFILE "rm *.dat\n";
     print WRITEFILE "echo \$HOSTNAME\n";
