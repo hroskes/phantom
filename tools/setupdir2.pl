@@ -756,12 +756,10 @@ if($system eq "SLURM"){
     print WRITEFILE "#SBATCH --mem=5000\n";
     print WRITEFILE "#SBATCH --mail-type=end\n";
     print WRITEFILE "#SBATCH --mail-user=$mail\n";
-    print WRITEFILE "#SBATCH --dependency=singleton\n";
     print WRITEFILE "\n";
 
     print WRITEFILE "cd $ENV{'CMSSW_DATA_PATH'}\n";
     print WRITEFILE "eval \$(scram ru -sh)\n";
-    print WRITEFILE "export LHAPDF_DATA_PATH=/work-zfs/lhc/installations/LHAPDF-6.1.5/share/LHAPDF\n";
     print WRITEFILE "cd $dirtreeroot/$dirname\n";
     print WRITEFILE "rm *.dat\n";
     print WRITEFILE "echo \$HOSTNAME\n";
@@ -802,7 +800,6 @@ elsif($system eq "LSF"){
 elsif($system eq "SLURM"){
     $job_name = $dirtreeroot;
     $job_name =~ s|.*/grid_||g;
-    $job_name = "${job_name}_${dirname}";
     print BATCHFILE "sbatch -o $dirtreeroot/$dirname/$runfilename.out -e $dirtreeroot/$dirname/$runfilename.out";
     print BATCHFILE " -J $job_name";
     print BATCHFILE " $dirtreeroot/$dirname/$runfilename\n";

@@ -17,8 +17,8 @@ then
         echo "Usage:"
         echo ""
         echo "gendir.scr -l LOCATION -q QUEUE -d NDIR -i INPUTDIR"
-        echo "        LOCATION = CERN, TO"
-        echo "        QUEUE = local queue (TO: slow; CERN: 8nm, 8nh, 1nd, 2nd, 1nw, 2nw)" 
+        echo "        LOCATION = CERN, TO, MARCC"
+        echo "        QUEUE = local queue (TO: slow; CERN: 8nm, 8nh, 1nd, 2nd, 1nw, 2nw; MARCC: shared)" 
         echo "        NDIR = Number of generation samples (max 100)"
         echo "        INPUTDIR = location of the gen1 prototype"
         echo ""
@@ -179,6 +179,7 @@ do
 	case $LOCATION in
 	        CERN )    echo "bsub -q $QUEUE -o $INPUTDIR/gen$X/$RUNFILE.out -J gen$X -u pippopluto < $INPUTDIR/gen$X/$RUNFILE" >> $SUBMITFILE ;;
 		TO )      echo "subcheck $INPUTDIR/gen$X $RUNFILE $QUEUE" >> $SUBMITFILE ;;
+                MARCC )   echo "sbatch -o $INPUTDIR/gen$X/$RUNFILE.out -e $INPUTDIR/gen$X/$RUNFILE.out $INPUTDIR/gen$X/$RUNFILE" >> $SUBMITFILE ;;
 	esac
     
     X=$((X+1))

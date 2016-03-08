@@ -1,11 +1,22 @@
-#!/bin/csh
+#!/bin/bash
 
+#SBATCH --job-name=JOBNAME
+#SBATCH --time=48:0:0
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --partition=shared
+#SBATCH --mem=5000
+#SBATCH --mail-type=end
+#SBATCH --mail-user=MAILADDRESS
+
+cd CMSSW_BASE
+eval $(scram ru -sh)
 cd FOLDER
 rm *.dat
 echo $HOSTNAME
 touch running
 date
-unbuffer /afs/cern.ch/user/g/govoni/work/PHANTOM/phantom_at_cern/phantom_1_2_1/phantom.exe
+unbuffer PHANTOMDIR/phantom.exe
 
 mv running finished
 date

@@ -5,13 +5,14 @@ for fil in `find . -name "phavegas*"`  ; do echo `pwd`/$fil ; done > GEN_FOLDER_
 cd .. ; 
 
 cd GEN_FOLDER_TEMP ; 
-cp ../phantom_1_2_5/tools/gendir.scr ./
+echo '*' > .gitignore
+ln -s ../gendir.scr ../run.TEMPLATE .
 mkdir gen1
 cat TEMPLATE_TEMP >gen1/r.in ; 
 echo "nfiles " `wc -l phav.dat` >> gen1/r.in ; 
 cat phav.dat >> gen1/r.in ; 
 echo ; 
 echo "****** ENDIF" >> gen1/r.in ; 
-cat /afs/cern.ch/user/g/govoni/work/PHANTOM/phantom_at_cern/phantom_templates/run_1_2_5.TEMPLATE  | sed -e s%FOLDER%GEN_FOLDER_TEMP/gen1% > GEN_FOLDER_TEMP/gen1/run ;
-./gendir.scr -l CERN -q QUEUE_TEMP -d 100 -i  `pwd` ; 
+cat run.TEMPLATE  | sed -e s%FOLDER%GEN_FOLDER_TEMP/gen1%g -e s%PHANTOMDIR%`pwd`/..%g -e s%MAILADDRESS%EMAIL%g -e s%JOBNAME%JOB_NAME%g -e s%CMSSW_BASE%$CMSSW_BASE%g > GEN_FOLDER_TEMP/gen1/run ;
+./gendir.scr -l MARCC -q QUEUE_TEMP -d 100 -i  `pwd` ; 
 ./submitfile

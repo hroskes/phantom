@@ -39,6 +39,7 @@ def execute (command) :
 
 if __name__ == '__main__':
 
+    user = os.environ["USER"]
     parser = argparse.ArgumentParser (description = 'run phantom productions on lxplus')
     parser.add_argument('-q', '--queue'    , default= '1nw',    help='batch queue [1nw]')
     parser.add_argument('-m', '--mass'     , default= '126',    help='Higgs mass [126]')
@@ -49,6 +50,7 @@ if __name__ == '__main__':
     parser.add_argument('-f', '--folder'   , default= 'none',   help='local folder name [from the date]')
     parser.add_argument('-c', '--channel'  , default= 'none',   help='production channel (list of leptons)')
     parser.add_argument('-T', '--Top'      , default= 'none',   help='number of tops (no restriction)')
+    parser.add_argument('-e', '--email'    , default= user,     help='email address to send to when jobs are done')
     
     args = parser.parse_args ()
 
@@ -73,6 +75,7 @@ if __name__ == '__main__':
         'HWIDTH_TEMP': str (args.width * args.scaling * args.scaling)
         }
 
+    args.folder = args.folder.rstrip("/")
 
     if args.step == '1' :
         # generate the grids
@@ -95,7 +98,7 @@ if __name__ == '__main__':
         if (args.Top != 'none') : 
             command += ' -T ' + args.Top
         command += ' -d ' + args.folder
-        command += ' -t ' + args.folder + '/r.in'
+        command += ' -t ' + args.folder + '/r.in -m ' + args.email
         command += ' -i "' + args.channel + '" -q ' + str (8 - len (args.channel.split ()))
         command += ' -s SLURM -n ' + args.queue
 
@@ -124,9 +127,12 @@ if __name__ == '__main__':
             'GEN_FOLDER_TEMP' : genFolder,
             'QUEUE_TEMP'      : args.queue,
             'TEMPLATE_TEMP'   : genFolder + '/r.in',
+            'EMAIL'           : args.email,
+            'JOB_NAME'        : os.path.basename(genFolder).replace("gen_","",1)
             }
         replaceParameterInFile ('submit_step2.sh', 'gen_' + args.folder + '.sh', substitute_step2)
         execute ('source ./gen_' + args.folder + '.sh')
+        os.remove('gen_' + args.folder + '.sh')
         execute ('squeue -u $USER -o "%.7i %.9P %.20j %.8u %.2t %.10M %.6D %R"')
     elif args.step == '3' :
         # generate the events
