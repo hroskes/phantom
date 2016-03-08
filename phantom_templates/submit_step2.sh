@@ -13,6 +13,6 @@ echo "nfiles " `wc -l phav.dat` >> gen1/r.in ;
 cat phav.dat >> gen1/r.in ; 
 echo ; 
 echo "****** ENDIF" >> gen1/r.in ; 
-cat run.TEMPLATE  | sed -e s%FOLDER%GEN_FOLDER_TEMP/gen1%g -e s%PHANTOMDIR%`pwd`/..%g -e s%MAILADDRESS%EMAIL%g -e s%JOBNAME%JOB_NAME%g -e s%CMSSW_BASE%$CMSSW_BASE%g > GEN_FOLDER_TEMP/gen1/run ;
+cat run.TEMPLATE  | sed -e s%FOLDER%GEN_FOLDER_TEMP/gen1%g -e s%PHANTOMDIR%`pwd`/..%g -e s%MAILADDRESS%EMAIL%g -e s%JOBNAME%JOB_NAME%g -e s%CMSSW_BASE%$CMSSW_BASE%g -e "s%JOBDEPENDENCY%DEPENDENCY%g" > GEN_FOLDER_TEMP/gen1/run ;
 ./gendir.scr -l MARCC -q QUEUE_TEMP -d 100 -i  `pwd` ; 
 ./submitfile

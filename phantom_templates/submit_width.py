@@ -1,14 +1,12 @@
 #!/usr/bin/python
 
 
-import sys
-import os
-import commands
-from commands import getstatusoutput
-import datetime
 import argparse
 import datetime
 import math
+import os
+import subprocess
+import sys
 
 dir = '/home-2/jroskes1@jhu.edu/work/heshy/phantom/phantom_1_2_8_nc/phantom_templates'
 
@@ -27,11 +25,11 @@ def replaceParameterInFile (inputFile, outputFile, substitute):
 # ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
 
-def execute (command) :
-    print 'running:'
-    print command
-    retCode = getstatusoutput (command)
-    for ri in retCode: print ri
+def execute (command, getoutput=False) :
+    if getoutput:
+        return subprocess.check_output(command, shell=True)
+    else:
+        return subprocess.check_call(command, shell=True)
 
 
 # ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -122,14 +120,27 @@ if __name__ == '__main__':
         getstatusoutput ('mkdir ' + genFolder)
         replaceParameterInFile (args.template, genFolder + '/r.in', substitute)
 
+        jobsrunning = execute ('squeue -u $USER -o "%.7i %.9P %.{}j %.8u %.2t %.10M %.6D %R"'.format(len(args.folder)+10), True).split("\n")
+        waitjobs = []
+        for job in jobsrunning:
+            if job.split()[3] == 'gen_' + args.folder:
+                waitjobs.append(job.split()[1])
+
+        if waitjobs:
+            dependency = "#SBATCH --dependency=afterok:" + ":".join(waitjobs)
+        else:
+            dependency = ""
+
         substitute_step2 = {
             'GRID_FOLDER_TEMP': gridFolder, 
             'GEN_FOLDER_TEMP' : genFolder,
             'QUEUE_TEMP'      : args.queue,
             'TEMPLATE_TEMP'   : genFolder + '/r.in',
             'EMAIL'           : args.email,
-            'JOB_NAME'        : os.path.basename(genFolder).replace("gen_","",1)
+            'JOB_NAME'        : os.path.basename(genFolder),
+            'DEPENDENCY'      : dependency,
             }
+
         replaceParameterInFile ('submit_step2.sh', 'gen_' + args.folder + '.sh', substitute_step2)
         execute ('source ./gen_' + args.folder + '.sh')
         os.remove('gen_' + args.folder + '.sh')

@@ -798,10 +798,8 @@ elsif($system eq "LSF"){
     print BATCHFILE " < $dirtreeroot/$dirname/$runfilename\n";
     }
 elsif($system eq "SLURM"){
-    $job_name = $dirtreeroot;
-    $job_name =~ s|.*/grid_||g;
     print BATCHFILE "sbatch -o $dirtreeroot/$dirname/$runfilename.out -e $dirtreeroot/$dirname/$runfilename.out";
-    print BATCHFILE " -J $job_name";
+    print BATCHFILE " -J $dirtreeroot";
     print BATCHFILE " $dirtreeroot/$dirname/$runfilename\n";
     }
 else{
