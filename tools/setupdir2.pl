@@ -14,6 +14,8 @@
 #
 
 
+use File::Basename;
+
 # DEFAULT DIRECTORIES AND FILES
 $dirtreeroot_def = "mh0";
 $basedir_def = "./";
@@ -798,8 +800,9 @@ elsif($system eq "LSF"){
     print BATCHFILE " < $dirtreeroot/$dirname/$runfilename\n";
     }
 elsif($system eq "SLURM"){
+    $jobname = basename($dirtreeroot);
     print BATCHFILE "sbatch -o $dirtreeroot/$dirname/$runfilename.out -e $dirtreeroot/$dirname/$runfilename.out";
-    print BATCHFILE " -J $dirtreeroot";
+    print BATCHFILE " -J $jobname";
     print BATCHFILE " $dirtreeroot/$dirname/$runfilename\n";
     }
 else{

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 
 import argparse
@@ -85,7 +85,7 @@ if __name__ == '__main__':
             print 'production channel missing'
             sys.exit (1)
 
-        getstatusoutput ('mkdir ' + args.folder)
+        execute('mkdir ' + args.folder)
         replaceParameterInFile (args.template, args.folder + '/r.in', substitute, append="****** ENDIF")
 
         command = './setupdir2.pl -b '+dir
@@ -113,14 +113,17 @@ if __name__ == '__main__':
         if not os.path.exists (gridFolder) :
             print 'folder', gridFolder, 'does not exist, quitting'
             sys.exit (1)
-        getstatusoutput ('mkdir ' + genFolder)
+        execute ('mkdir ' + genFolder)
         replaceParameterInFile (args.template, genFolder + '/r.in', substitute)
 
         jobsrunning = execute ('squeue -u $USER -o "%.7i %.9P %.{}j %.8u %.2t %.10M %.6D %R"'.format(len(args.folder)+10), True).split("\n")
         waitjobs = []
         for job in jobsrunning:
-            if job.split()[3] == 'gen_' + args.folder:
-                waitjobs.append(job.split()[1])
+            if not job: continue
+            if job.split()[2] == 'grid_' + args.folder:
+                waitjobs.append(job.split()[0])
+            if job.split()[2] == 'gen_' + args.folder:
+                raise RuntimeError("Job is already running:\n" + job)
 
         if waitjobs:
             dependency = "#SBATCH --dependency=afterok:" + ":".join(waitjobs)
@@ -134,7 +137,7 @@ if __name__ == '__main__':
             'TEMPLATE_TEMP'   : genFolder + '/r.in',
             'EMAIL'           : args.email,
             'JOB_NAME'        : os.path.basename(genFolder),
-            'DEPENDENCY'      : dependency,
+            'DEPENDENCY_TEMP' : dependency,
             }
 
         replaceParameterInFile ('submit_step2.sh', 'gen_' + args.folder + '.sh', substitute_step2)

@@ -539,7 +539,7 @@ scalemax  1.1d0
 
 *        CALL iread ('nunwevts',nunwevts,1)	 
 *               !  number of unweighted events to be produced
-nunwevts   25000
+nunwevts   100
 
 *        CALL iread('iwrite_event',iwrite_event,1)
 *                  ! yes/no momenta of flat events written in .dat files
