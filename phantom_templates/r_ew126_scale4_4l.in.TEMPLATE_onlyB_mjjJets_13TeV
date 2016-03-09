@@ -10,11 +10,7 @@ idum  -123456789
 
 *      CALL cread('PDFname',PDFname)
 
-*PDFname   /home/phantom/phantom/lhapdf-5.8.9/lhapdf/share/lhapdf/PDFsets/cteq6ll.LHpdf
-*PDFname   /afs/cern.ch/user/b/ballest/phantom/lhapdf-5.8.9_work/share/lhapdf/PDFsets/cteq6ll.LHpdf
-*PDFname   /cmshome/nicola/phantom_1_2_8/LHAPDF/share/lhapdf/PDFsets/NNPDF30_lo_as_0130.LHgrid
-*PDFname   /cmshome/nicola/phantom_1_2_8/LHAPDF/share/lhapdf/PDFsets/cteq6ll.LHpdf
-PDFname   /afs/cern.ch/user/n/ndefilip/work/phantom_1_2_8/LHAPDF/share/lhapdf/PDFsets/NNPDF30_lo_as_0130.LHgrid
+PDFname   NNPDF30_lo_as_0130.LHgrid
 
 *      CALL iread('i_PDFscale',i_PDFscale,1) ! selects the way of 
 *                                            ! calculating the PDF scale:
@@ -171,7 +167,7 @@ rmnd 1.d5
 *           ! 0= normal run of one process   
 *           ! 1= one shot unweighted event generation of all processes
 *           !  corresponding to phavegas files indicated at the end after nfiles
-ionesh  1
+ionesh  IONESH_TEMP
  
 *      CALL rread('ecoll',ecoll,1)    ! collider energy
 ecoll    13000.d0
@@ -770,7 +766,3 @@ i_usercutsos  0
 *    all single processes in the inoheshot=0 calculations.
 *    Immediately after the line nfiles, the full address of all files 
 *      phavegas...dat must be written, one per line 
-* nfiles   1
-* /cmshome/nicola/phantom_1_2_8/phavegas01.dat
-* /cmshome/nicola/phantom_1_2_8/phavegas02.dat
-* /cmshome/nicola/phantom_1_2_8/phavegas03.dat
