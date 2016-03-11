@@ -318,7 +318,7 @@ KEY_CC_FAM: foreach (keys %pdgcontent_cc_fam){
 		    }
                   }  
 		  
-		}            # end of check on kosherness
+		}            # end of check on kashrus
 
             }                      # end of $iu_ loop
           }                      # end of $is_ loop
