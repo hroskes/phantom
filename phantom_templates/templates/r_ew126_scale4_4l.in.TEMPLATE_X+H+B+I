@@ -253,7 +253,7 @@ gamhh  -12
 
 *      CALL iread('i_hh',i_hh,1) ! yes/no singlet implementation
 
-i_hh   0
+i_hh   1
 
 *      if (i_hh.eq. 1) then
 
@@ -262,13 +262,13 @@ i_hh   0
 
 *        CALL rread('rmhh_ns',rmhh,1)   ! heavier higgs mass (GeV) (not singlet)
 
-rmhh_ns      500.d0
+rmhh_ns      XMASS_TEMPd0
 
 *        CALL rread('ghhfactor',ghhfactor,1) ! factor for second higgs,
 *                                          ! which multiplies SM higgs
 *                                          ! couplings
 *                ! if ghhfactor is negative, ghhfactor=sqrt(1-ghfactor**2)
-ghhfactor      -1.d0
+ghhfactor      XCOUP_TEMPd0
 
 
 *        CALL rread('gamhh_ns',gamhh,1)  ! heavier Higgs width (GeV) (not singlet)
@@ -276,7 +276,7 @@ ghhfactor      -1.d0
 *                                     ! in this last case SM gamh is multiplied
 *                                    ! by ghhfactor**2
 
-gamhh_ns    -41.62d0
+gamhh_ns    XWIDTH_TEMPd0
 
 *      endif
 
@@ -537,7 +537,7 @@ scalemax  1.1d0
 
 *        CALL iread ('nunwevts',nunwevts,1)
 *               !  number of unweighted events to be produced
-nunwevts   100
+nunwevts   10000
 
 *        CALL iread('iwrite_event',iwrite_event,1)
 *                  ! yes/no momenta of flat events written in .dat files
