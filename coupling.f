@@ -27,10 +27,10 @@ c s14
 * heavhend
 c s14end
 
-      DATA rmw/80.40d0/, rmz/91.187d0/, rmt/175.d0/, rmb/4.75d0/,
-     &     rmc/0.75d0/,rmtau/1.78d0/,
-     &     gamw/0.2042774d+01/, gamz/0.25007d+01/
-      DATA gf/1.16639d-05/, alfainv_me/137.0359895d0/,
+      DATA rmw/80.399d0/, rmz/91.1876d0/, rmt/173.2d0/, rmb/4.75d0/,
+     &     rmc/1.275d0/,rmtau/1.7768d0/,
+     &     gamw/0.2085d+01/, gamz/0.24952d+01/
+      DATA gf/1.16639d-05/, alfainv_me/128.d0/,
      &  alfas_w/0.1225d0/, alfas_z/0.123d0/,
      &  alfas_t/0.100d0/, alfas_h/0.100d0/
 
@@ -90,12 +90,21 @@ c      print*, 'rmt_runhh',rmt_runhh
       alfas_h= pyalps(qsquared)
       
 
-c gfermi scheme
 
-      s2w=1.d0-rmw2/rmz2
-      g2=4.d0*sqrt(2.d0)*gf*rmw2
-      elcharge2=s2w*g2
-      alfainv=4.d0*pi/elcharge2
+c      s2w=1.d0-rmw2/rmz2
+c      g2=4.d0*sqrt(2.d0)*gf*rmw2
+c      elcharge2=s2w*g2
+c      alfainv=4.d0*pi/elcharge2
+
+c Ulascan proposal
+      s2w=0.23119d0
+      alfainv=128d0
+      elcharge2=4d0*pi/alfainv
+      g2=elcharge2/s2w
+      vev=1.d0/sqrt(sqrt(2.d0)*gf)
+
+c gfermi scheme
+*      vev=2.d0*rmw/sqrt(g2)
 
       sw=sqrt(s2w)
       rc2w=1.d0-s2w
