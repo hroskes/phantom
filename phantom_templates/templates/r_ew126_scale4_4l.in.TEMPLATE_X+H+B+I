@@ -221,14 +221,14 @@ i_signal   0
 
 *      CALL iread('i_singlet',i_singlet,1) ! yes/no singlet implementation
 
-i_singlet  0
+i_singlet  1
 
 * SINGLET MODEL PARAMETERS
 *      if (i_singlet.eq.1) then
 
 *        CALL rread('rmhh',rmhh,1) ! mass of the heavier higgs
 
-rmhh 600.d0
+rmhh XMASS_TEMPd0
 
 *        CALL rread('rcosa',rcosa,1) ! parameter cos alfa of arXiv:1303.1150
 
@@ -244,7 +244,7 @@ tgbeta  2.d0
 *                                    ! by (1-rcosa**2) + decay of heavy higgs
 *                                    !     to 2 light ones: hh-> h+h
 
-gamhh  -12
+gamhh  XWIDTH_TEMPd0
 
 *      endif
 
@@ -253,7 +253,7 @@ gamhh  -12
 
 *      CALL iread('i_hh',i_hh,1) ! yes/no singlet implementation
 
-i_hh   1
+i_hh   0
 
 *      if (i_hh.eq. 1) then
 
