@@ -221,7 +221,7 @@ i_signal   0
 
 *      CALL iread('i_singlet',i_singlet,1) ! yes/no singlet implementation
 
-i_singlet  1
+i_singlet  0
 
 * SINGLET MODEL PARAMETERS
 *      if (i_singlet.eq.1) then
@@ -253,7 +253,7 @@ gamhh  XWIDTH_TEMPd0
 
 *      CALL iread('i_hh',i_hh,1) ! yes/no singlet implementation
 
-i_hh   0
+i_hh   1
 
 *      if (i_hh.eq. 1) then
 

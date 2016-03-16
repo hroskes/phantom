@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=JOBNAME
+#SBATCH --job-name=JOB_NAME
 #SBATCH --time=0:2:0
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
