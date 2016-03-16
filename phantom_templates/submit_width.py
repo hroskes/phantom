@@ -153,10 +153,11 @@ if __name__ == '__main__':
             'EMAIL'           : args.email,
             'JOB_NAME'        : os.path.basename(genFolder),
             'DEPENDENCY_TEMP' : dependency,
+            'CMSSW_BASE_TEMP' : os.environ["CMSSW_BASE"],
             }
 
         replaceParameterInFile ('submit_step2.sh', 'gen_' + args.folder + '.sh', substitute_step2)
-        execute ('source ./gen_' + args.folder + '.sh')
+        execute ('sbatch ./gen_' + args.folder + '.sh')
         os.remove('gen_' + args.folder + '.sh')
         execute ('squeue -u $USER -o "%.7i %.9P %.20j %.8u %.2t %.10M %.6D %R"')
     elif args.step == 3 :
