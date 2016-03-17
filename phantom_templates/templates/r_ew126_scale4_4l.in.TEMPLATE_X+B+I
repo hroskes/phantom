@@ -175,7 +175,7 @@ ecoll    13000.d0
 
 *      CALL rread('rmh',rmh,1)   ! Higgs mass (GeV)
 *                                ! <0 means no Higgs
-rmh      HMASS_TEMPd0
+rmh      -HMASS_TEMPd0
 
 *      CALL rread('ghfactor',ghfactor,1)   ! factor which multiplies SM higgs
 *                                          ! couplings
@@ -253,7 +253,7 @@ gamhh  XWIDTH_TEMPd0
 
 *      CALL iread('i_hh',i_hh,1) ! yes/no singlet implementation
 
-i_hh   0
+i_hh   1
 
 *      if (i_hh.eq. 1) then
 

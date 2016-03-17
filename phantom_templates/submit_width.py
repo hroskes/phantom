@@ -38,7 +38,6 @@ def execute (command, getoutput=False) :
 
 # ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
-
 if __name__ == '__main__':
 
     user = os.environ["USER"]
@@ -50,12 +49,15 @@ if __name__ == '__main__':
     parser.add_argument('-M', '--Xmass',                         type = float, help='Second resonance mass')
     parser.add_argument('-W', '--Xwidth',                        type = float, help='Second resonance width')
     parser.add_argument('-L', '--Xscaling',   default = 1.,      type = float, help='squared coupling modifier [1]')
-    parser.add_argument('-s', '--step',       default = 1,       type = int,   help='production step [1]')
+    parser.add_argument('-s', '--step',                          type = int,   help='production step [1]')
     parser.add_argument('-t', '--template',                                    help='input template file [none]')
     parser.add_argument('-f', '--folder',                                      help='local folder name [from the date]')
     parser.add_argument('-c', '--channel',                                     help='production channel (list of leptons)')
     parser.add_argument('-T', '--Top',                                         help='number of tops (no restriction)')
     parser.add_argument('-e', '--email',     default = user,                   help='email address to send to when jobs are done')
+
+    if "CMSSW_BASE" not in os.environ:
+        raise RuntimeError("Need to cmsenv!")
 
     args = parser.parse_args ()
 
@@ -75,48 +77,50 @@ if __name__ == '__main__':
                   'XMASS_TEMP':  args.Xmass,
                   'XCOUP_TEMP':  math.sqrt(args.Xscaling),
                   'XWIDTH_TEMP': args.Xwidth * args.Xscaling * args.Xscaling if args.Xwidth is not None else None,
-                  'IONESH_TEMP': args.step-1,
                  }
     mandatory = {
                  'HMASS_TEMP': IOError("Please provide the higgs mass (-m mass)"),
                  'HWIDTH_TEMP': IOError("Please provide the higgs width (-w width)"),
                  'XMASS_TEMP': IOError("Please provide the second resonance mass (-M mass)"),
                  'XWIDTH_TEMP': IOError("Please provide the second resonance width (-W width)"),
+                 'IONESH_TEMP': RuntimeError("Something is wrong!"),
                 }
 
     args.folder = args.folder.rstrip("/")
 
-    if args.step == 1 :
+    if args.step == 1 or args.step is None:
         # generate the grids
         # ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+        substitute['IONESH_TEMP'] = 0
         if args.folder is None :
-            args.folder = os.getcwd () + '/grid_' + datetime.datetime.now().strftime('%y-%m-%d-%H-%M')
+            gridFolder = os.getcwd () + '/grid_' + datetime.datetime.now().strftime('%y-%m-%d-%H-%M')
         else :
-            args.folder = os.getcwd () + '/grid_' + args.folder
-        if os.path.exists (args.folder) :
-            print 'folder', args.folder, 'exists, quitting'
+            gridFolder = os.getcwd () + '/grid_' + args.folder
+        if os.path.exists (gridFolder) :
+            print 'folder', gridFolder, 'exists, quitting'
             sys.exit (1)
         if args.channel is None :
             print 'production channel missing'
             sys.exit (1)
 
-        execute('mkdir ' + args.folder)
-        replaceParameterInFile (args.template, args.folder + '/r.in', substitute, append="****** ENDIF", mandatory=mandatory)
+        execute('mkdir ' + gridFolder)
+        replaceParameterInFile (args.template, gridFolder + '/r.in', substitute, append="****** ENDIF", mandatory=mandatory)
 
         command = './setupdir2.pl -b '+dir
         if (args.Top is not None) :
             command += ' -T ' + args.Top
-        command += ' -d ' + args.folder
-        command += ' -t ' + args.folder + '/r.in -m ' + args.email
+        command += ' -d ' + gridFolder
+        command += ' -t ' + gridFolder + '/r.in -m ' + args.email
         command += ' -i "' + args.channel + '" -q ' + str (8 - len (args.channel.split ()))
         command += ' -s SLURM -n ' + args.queue
 
         execute (command)
-        execute ('source ' + args.folder + '/SLURMfile')
-        execute ('squeue -u $USER -o "%.7i %.9P %.20j %.8u %.2t %.10M %.6D %R"')
-    elif args.step == 2 :
+        execute ('source ' + gridFolder + '/SLURMfile')
+        #execute ('squeue -u $USER -o "%.7i %.9P %.20j %.8u %.2t %.10M %.6D %R"')
+    if args.step == 2 or args.step is None:
         # generate the events
         # ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+        substitute['IONESH_TEMP'] = 1
         if args.folder is None :
             print 'please provide a folder name (without the "gen_" prefix)'
             sys.exit (1)
@@ -159,8 +163,8 @@ if __name__ == '__main__':
         replaceParameterInFile ('submit_step2.sh', 'gen_' + args.folder + '.sh', substitute_step2)
         execute ('sbatch ./gen_' + args.folder + '.sh')
         os.remove('gen_' + args.folder + '.sh')
-        execute ('squeue -u $USER -o "%.7i %.9P %.20j %.8u %.2t %.10M %.6D %R"')
-    elif args.step == 3 :
+        #execute ('squeue -u $USER -o "%.7i %.9P %.20j %.8u %.2t %.10M %.6D %R"')
+    if args.step == 3:
         # generate the events
         # ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
         if args.folder is None :
