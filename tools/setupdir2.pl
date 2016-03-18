@@ -760,7 +760,7 @@ if($system eq "SLURM"){
     print WRITEFILE "#SBATCH --mail-user=$mail\n";
     print WRITEFILE "\n";
 
-    print WRITEFILE "cd $ENV{'CMSSW_DATA_PATH'}\n";
+    print WRITEFILE "cd $ENV{'CMSSW_BASE'}\n";
     print WRITEFILE "eval \$(scram ru -sh)\n";
     print WRITEFILE "cd $dirtreeroot/$dirname\n";
     print WRITEFILE "rm *.dat\n";

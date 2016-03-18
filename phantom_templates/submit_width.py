@@ -16,7 +16,7 @@ def replaceParameterInFile (inputFile, outputFile, substitute, append=None, mand
         s = f.read()
     if mandatory is not None:
         for m, error in mandatory.iteritems():
-            if m in s and substitute[m] is None:
+            if m in s and (m not in substitute or substitute[m] is None):
                 raise error
     for k,v in substitute.iteritems():
         s = s.replace(k, str(v))
@@ -37,6 +37,29 @@ def execute (command, getoutput=False) :
 
 
 # ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+
+def getparameter(template, parametername, substitute=None):
+    result = None
+    with open(template) as f:
+        for line in f:
+            data = line.split()
+            if len(data) == 2 and data[0] == parametername:
+                if result is not None:
+                    raise IOError(parametername + " appears twice in the template!")
+                result = data[1]
+
+    if result is None:
+        raise IOError(parametername + " doesn't appear in the template!")
+
+    if substitute is not None:
+        for k,v in substitute.iteritems():
+            result = result.replace(k, str(v))
+
+    return result
+
+
+
 
 if __name__ == '__main__':
 
@@ -107,8 +130,11 @@ if __name__ == '__main__':
         replaceParameterInFile (args.template, gridFolder + '/r.in', substitute, append="****** ENDIF", mandatory=mandatory)
 
         command = './setupdir2.pl -b '+dir
-        if (args.Top is not None) :
+        if args.Top is not None:
             command += ' -T ' + args.Top
+        i_signal = int(getparameter(args.template, "i_signal"))
+        if i_signal == 1: command += " -Hs"
+        if i_signal == 2: command += " -S"
         command += ' -d ' + gridFolder
         command += ' -t ' + gridFolder + '/r.in -m ' + args.email
         command += ' -i "' + args.channel + '" -q ' + str (8 - len (args.channel.split ()))
