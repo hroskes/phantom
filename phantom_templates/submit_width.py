@@ -31,7 +31,7 @@ def replaceParameterInFile (inputFile, outputFile, substitute, append=None, mand
 
 def execute (command, getoutput=False) :
     if getoutput:
-        return subprocess.check_output(command, shell=True)
+        return subprocess.check_output(command, shell=True).rstrip("\n")
     else:
         return subprocess.check_call(command, shell=True)
 
@@ -206,15 +206,31 @@ if __name__ == '__main__':
             sys.exit (1)
         command = 'cd ' + gridFolder + '; grep SIGMA */run.out > res ; '
         command += dir+'/tools/totint.exe > result '
-        print command
         execute (command)
 
         command = 'cd ' + genFolder + '; grep -A 1 total\ integral gen*/run.o* > res ; '
         command += dir+'/gentotint.exe > result '
-        print command
         execute (command)
 
+        gridresult = execute ('tail -n 1 ' + gridFolder + '/result', True)
+        genresult = execute ('tail -n 1 ' + genFolder + '/result', True)
+
         print '---> cross section from grids:'
-        execute ('tail -n 1 ' + gridFolder + '/result')
+        print gridresult
         print '---> cross section from generation:'
-        execute ('tail -n 1 ' + genFolder + '/result')
+        print genresult
+
+        gridxsec = float(gridresult.split("=")[1].split("+/-")[0])
+        griderr  = float(gridresult.split("=")[1].split("+/-")[1])
+        genxsec  = float( genresult.split("=")[1].split("+/-")[0])
+        generr   = float( genresult.split("=")[1].split("+/-")[1])
+
+        overallxsec = (gridxsec / griderr**2 + genxsec / generr**2)
+        overallerr = 1/(1/griderr**2 + 1/generr**2) ** .5
+        overallresult =  "total cross section= {:>25} +/- {:>25}".format(overallxsec, overallerr)
+
+        print "---> combined cross section:"
+        print overallresult
+
+        print "---> difference between gen and grid:"
+        print "{} = {}*error".format(genxsec-gridxsec, (genxsec-gridxsec)/overallerr)
