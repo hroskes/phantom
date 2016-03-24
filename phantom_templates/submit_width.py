@@ -225,7 +225,7 @@ if __name__ == '__main__':
         genxsec  = float( genresult.split("=")[1].split("+/-")[0])
         generr   = float( genresult.split("=")[1].split("+/-")[1])
 
-        overallxsec = (gridxsec / griderr**2 + genxsec / generr**2)
+        overallxsec = (gridxsec / griderr**2 + genxsec / generr**2) / (1/griderr**2 + 1/generr**2)
         overallerr = 1/(1/griderr**2 + 1/generr**2) ** .5
         overallresult =  "total cross section= {:>25} +/- {:>25}".format(overallxsec, overallerr)
 
@@ -233,4 +233,4 @@ if __name__ == '__main__':
         print overallresult
 
         print "---> difference between gen and grid:"
-        print "{} = {}*error".format(genxsec-gridxsec, (genxsec-gridxsec)/overallerr)
+        print "{} = {}*error = {}%".format(genxsec-gridxsec, (genxsec-gridxsec)/(griderr**2 + generr**2)**.5, (genxsec-gridxsec) / overallxsec * 100)

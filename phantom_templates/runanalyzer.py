@@ -14,7 +14,7 @@ def cd(path):
 template = """
 #!/bin/bash
 #SBATCH --job-name=JOBNAME
-#SBATCH --time=48:0:0
+#SBATCH --time=3:0:0
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --partition=shared
@@ -24,8 +24,8 @@ template = """
 
 cd {CMSSW_BASE}
 eval $(scram ru -sh)
-cd $SLURM_SUBMIT_DIR
-analyzer indir=$(pwd) phamom.lhe outdir=$(pwd) outfile=phamom.root computeVBFProdAngles=1 computeVHProdAngles=3
+cd {dir}
+analyzer indir=$(pwd)/ phamom.lhe outdir=$(pwd)/ outfile=phamom.root computeVBFProdAngles=1 computeVHProdAngles=3
 """.strip()
 
 def runanalyzer(folder):
@@ -36,6 +36,7 @@ def runanalyzer(folder):
                 command += "cat */phamom.dat > phamom.lhe\n"
             themap = {
                       "CMSSW_BASE": os.environ["CMSSW_BASE"],
+                      "dir": os.getcwd(),
                      }
             command += template.format(**themap)
             with open("slurm.sh", "w") as f:
