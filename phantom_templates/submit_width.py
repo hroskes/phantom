@@ -111,6 +111,11 @@ if __name__ == '__main__':
 
     args.folder = args.folder.rstrip("/")
 
+    if args.step is None:
+        if os.path.exists (genFolder) :
+            print 'folder', genFolder, 'exists, quitting'
+            sys.exit (1)
+
     if args.step == 1 or args.step is None:
         # generate the grids
         # ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
