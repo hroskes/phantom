@@ -78,6 +78,7 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--channel',                                     help='production channel (list of leptons)')
     parser.add_argument('-T', '--Top',                                         help='number of tops (no restriction)')
     parser.add_argument('-e', '--email',     default = user,                   help='email address to send to when jobs are done')
+    parser.add_argument('-n', '--nevents',   default = 1000000,  type = int,   help='number of events to produce')
 
     if "CMSSW_BASE" not in os.environ:
         raise RuntimeError("Need to cmsenv!")
@@ -100,6 +101,7 @@ if __name__ == '__main__':
                   'XMASS_TEMP':  args.Xmass,
                   'XCOUP_TEMP':  math.sqrt(args.Xscaling),
                   'XWIDTH_TEMP': args.Xwidth * args.Xscaling * args.Xscaling if args.Xwidth is not None else None,
+                  'NEVENTS_TEMP': args.nevents / 100, #nevents are split among 100 jobs
                  }
     mandatory = {
                  'HMASS_TEMP': IOError("Please provide the higgs mass (-m mass)"),
@@ -112,6 +114,7 @@ if __name__ == '__main__':
     args.folder = args.folder.rstrip("/")
 
     if args.step is None:
+        genFolder  = os.getcwd () + '/gen_'  + args.folder
         if os.path.exists (genFolder) :
             print 'folder', genFolder, 'exists, quitting'
             sys.exit (1)
