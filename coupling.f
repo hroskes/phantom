@@ -115,7 +115,7 @@ c gfermi scheme
 * unitarization 27/4/2010
 
 *      vev=1.d0/sqrt(sqrt(2.d0)*gf) 
-      vev=2.d0*rmw/sqrt(g2)
+*      vev=2.d0*rmw/sqrt(g2)
 *      print*, 'vev=',vev
       vev2=vev*vev
       vev4=vev2*vev2
