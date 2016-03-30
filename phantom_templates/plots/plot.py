@@ -74,6 +74,11 @@ for dir in os.listdir(".."):
     if dir not in h: continue
     print dir
     f = ROOT.TFile(os.path.join("..", dir, "phamom.root"))
+    print f
+    if not f.Get("SelectedTree"):
+        print f
+        f = ROOT.TFile("../gen_B/phamom.root")
+    print
     f.ls()
     t = f.Get("SelectedTree")
     t.Draw("GenHMass>>h_{}({})".format(dir, binning), "GenHMass!=0 && GenHMass<600")
@@ -87,7 +92,7 @@ for dir in os.listdir(".."):
     legend.AddEntry(h[dir], dir.replace("gen_", ""), "l")
 
     print dir, getxsec(dir), h[dir].Integral(), t.GetEntries()
-    h[dir].Scale(getxsec(dir) / h[dir].Integral())
+    h[dir].Scale(getxsec(dir) / t.GetEntries())
 
 hstack.Draw("hist nostack")
 legend.Draw()
