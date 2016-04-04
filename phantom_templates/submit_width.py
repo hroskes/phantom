@@ -8,7 +8,8 @@ import os
 import subprocess
 import sys
 
-dir = '/home-2/jroskes1@jhu.edu/work/heshy/phantom/phantom_1_2_8_nc/phantom_templates'
+dir = os.getcwd()
+assert os.path.basename(dir) == "phantom_templates"
 
 
 def replaceParameterInFile (inputFile, outputFile, substitute, append=None, mandatory=None):
