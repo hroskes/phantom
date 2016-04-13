@@ -65,8 +65,10 @@ def runanalyzer(folder):
                 command = template_fixcolors.format(**themap)
                 with open("slurm.sh", "w") as f:
                     f.write(command)
-                os.system("sbatch slurm.sh")
+                #os.system("sbatch slurm.sh")
         else:
+            if os.path.exists("phamom.root"):
+                return
             themap = {
                       "CMSSW_BASE": os.environ["CMSSW_BASE"],
                       "dir": os.getcwd(),

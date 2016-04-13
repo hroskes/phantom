@@ -26,7 +26,12 @@ def getxsec(dir):
         for xsec in output.split("--->"):
             if "combined cross section" not in xsec: continue
             xsec = xsec.split("=")[1].split("+/-")[0]
-            return float(xsec)
+            xsec = float(xsec)
+
+            if "times1e6" in dir:
+                xsec /= 1e6**8
+
+            return xsec
 
 
 hstack = ROOT.THStack("m4l", "m_{4l}")
@@ -37,29 +42,64 @@ hnames = [
           "gen_H+B+I",
           "gen_X+B+I",
           "gen_X+H+B+I",
+          "gen_X+H_times1e6_2e2mu",
          ]
 h = OrderedDict((hname, None) for hname in hnames)
 finalhnames = [
-               "H",
-               "X",
-               "B",
-               "HB_int",
-               "XB_int",
-               "HX_int",
+               "M=450 #Gamma=47",            #X
+               "SM bkg",                     #HB
+               "BSI",                        #XHB
+               "H",                          #H
+               "XH",                         #XH
+               "ZZ",                       #B
+               "X+ZZ",                     #XB
+               "X-H interference",           #XH - X - H
+               "X-ZZ interference",        #XB - X - B
+#               "X-ZZ + X-H interference",  #XB - X - B + XH - X - H
+               "X-(ZZ+H) interference",    #XHB - X - HB
               ]
 matrix = numpy.matrix(
           [
-           [ 1,  0,  0,  0,  0,  0],
-           [ 0,  1,  0,  0,  0,  0],
-           [ 0,  0,  1,  0,  0,  0],
-           [ 1,  0,  1,  1,  0,  0],
-           [ 0,  1,  1,  0,  1,  0],
-           [ 1,  1,  1,  1,  1,  1],
+           [ 0,  1,  0,  0,  0,  0,  0],
+           [ 0,  0,  0,  1,  0,  0,  0],
+           [ 0,  0,  0,  0,  0,  1,  0],
+           [ 1,  0,  0,  0,  0,  0,  0],
+           [ 1,  1,  1, -1, -1,  1,  0],
+           [ 0,  0,  1,  0,  0,  0,  0],
+           [ 0,  0,  0,  0,  1,  0,  0],
+           [ 0,  0,  1, -1, -1,  1,  0],
+           [ 0, -1, -1,  0,  1,  0,  0],
+#           [-1, -2, -1,  0,  1,  0,  1],
+           [ 0, -1,  0, -1,  0,  1,  0],
           ]
          )
-invertedmatrix = matrix.I
-print invertedmatrix
-binning = "60,0,600"
+finalcolors = [
+               1,
+               6,
+               4,
+               8,
+               93,
+               38,
+               2,
+               93,
+               1,
+#               4,
+               2,
+              ]
+finalstyles = [
+               1,
+               1,
+               1,
+               1,
+               1,
+               1,
+               1,
+               2,
+               2,
+#               2,
+               2,
+              ]
+binning = "200,71,1071"
 
 c1 = ROOT.TCanvas()
 color = 1
@@ -74,15 +114,13 @@ for dir in os.listdir(".."):
     if dir not in h: continue
     print dir
     f = ROOT.TFile(os.path.join("..", dir, "phamom.root"))
-    print f
-    if not f.Get("SelectedTree"):
-        print f
-        f = ROOT.TFile("../gen_B/phamom.root")
-    print
+    assert f
     f.ls()
     t = f.Get("SelectedTree")
-    t.Draw("GenHMass>>h_{}({})".format(dir, binning), "GenHMass!=0 && GenHMass<600")
+    assert t
+    t.Draw("GenHMass>>h_{}({})".format(dir, binning), "GenHMass!=0")
     h[dir] = getattr(ROOT.gDirectory, "h_{}".format(dir))
+    assert h[dir]
     h[dir].SetDirectory(0)
     h[dir].SetLineColor(color)
     color += 1
@@ -100,25 +138,30 @@ for ext in "png", "eps", "root", "pdf":
     c1.SaveAs("test.{}".format(ext))
 
 
-hnew = [None]*6
+hnew = [None]*len(finalhnames)
 
 color = 1
 hstack = ROOT.THStack("m4l", "m_{4l}")
-legend = ROOT.TLegend(.6, .7, .9, .9)
-legend.SetFillStyle(0)
-legend.SetBorderSize(0)
+legend = [ROOT.TLegend(0.25,0.72,0.5,0.92), ROOT.TLegend(0.6,0.32,0.9,0.52)]
+for l in legend:
+    l.SetFillStyle(0)
+    l.SetBorderSize(0)
 
-for i in range(6):
+for i in range(len(finalhnames)):
     hnew[i] = ROOT.TH1F(finalhnames[i], finalhnames[i].replace("_", " "), *(int(a) for a in binning.split(",")))
     for j, (dir, hold) in enumerate(h.iteritems()):
-        if j >= 6: continue
-        hnew[i].Add(hold, invertedmatrix[i,j])
-    hnew[i].SetLineColor(color)
+        if j >= len(hnames): continue
+        print dir
+        assert hold
+        hnew[i].Add(hold, matrix[i,j])
+    hnew[i].SetLineColor(finalcolors[i])
+    hnew[i].SetLineStyle(finalstyles[i])
+    hnew[i].SetLineWidth(2)
     color += 1
     if color == 5: color += 1
     if color == 7: color = ROOT.kViolet
     hstack.Add(hnew[i])
-    legend.AddEntry(hnew[i], hnew[i].GetTitle(), "l")
+    legend[finalstyles[i]-1].AddEntry(hnew[i], hnew[i].GetTitle(), "l")
 
 h["gen_X+H+B+I"].SetLineWidth(3)
 #hstack.Add(h["gen_X+H+B+I"])
@@ -126,11 +169,16 @@ h["gen_X+H+B+I"].SetLineWidth(3)
 
 hstack.SetMinimum(-4e-6)
 hstack.Draw("hist nostack")
-legend.Draw()
+hstack.GetXaxis().SetRange(16, 186)
+for l in legend:
+    l.Draw()
 for ext in "png", "eps", "root", "pdf":
     c1.SaveAs("test_final.{}".format(ext))
 
-hstack.SetMaximum(0.04e-3)
+hstack.SetMaximum(0.025e-3)
 for ext in "png", "eps", "root", "pdf":
     c1.SaveAs("test_final_zoomint.{}".format(ext))
-subprocess.call("rsync -az *.{png,eps,root,pdf} hroskes@lxplus.cern.ch:www/VBF/phantom/", shell=True)
+
+command = "rsync -az *.{png,eps,root,pdf} hroskes@lxplus.cern.ch:www/VBF/phantom/"
+print command
+subprocess.call(command, shell=True)
