@@ -24,9 +24,9 @@ def getxsec(dir):
     with cd(".."):
         output = subprocess.check_output(["./submit_width.py", "-s", "3", "-f", dir])
         for xsec in output.split("--->"):
-            if "combined cross section" not in output: continue
-            output = output.split("=")[1].split("+/-")[0]
-            return float(output)
+            if "combined cross section" not in xsec: continue
+            xsec = xsec.split("=")[1].split("+/-")[0]
+            return float(xsec)
 
 
 hstack = ROOT.THStack("m4l", "m_{4l}")
