@@ -124,8 +124,13 @@ h["gen_X+H+B+I"].SetLineWidth(3)
 #hstack.Add(h["gen_X+H+B+I"])
 #legend.AddEntry(h["gen_X+H+B+I"], "X+H+B+I", "l")
 
-
+hstack.SetMinimum(-4e-6)
 hstack.Draw("hist nostack")
 legend.Draw()
 for ext in "png", "eps", "root", "pdf":
     c1.SaveAs("test_final.{}".format(ext))
+
+hstack.SetMaximum(0.04e-3)
+for ext in "png", "eps", "root", "pdf":
+    c1.SaveAs("test_final_zoomint.{}".format(ext))
+subprocess.call("rsync -az *.{png,eps,root,pdf} hroskes@lxplus.cern.ch:www/VBF/phantom/", shell=True)
