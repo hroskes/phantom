@@ -66,7 +66,7 @@ if __name__ == '__main__':
 
     user = os.environ["USER"]
     parser = argparse.ArgumentParser (description = 'run phantom productions on lxplus')
-    parser.add_argument('-q', '--queue',     default= '1nw',                   help='batch queue [1nw]')
+    parser.add_argument('-q', '--queue',     default= 'shared',                help='batch queue [1nw]')
     parser.add_argument('-m', '--mass',                          type = float, help='Higgs mass')
     parser.add_argument('-w', '--width',                         type = float, help='Higgs width')
     parser.add_argument('-l', '--scaling',   default = 1.,       type = float, help='squared coupling modifier [1]')
@@ -78,7 +78,7 @@ if __name__ == '__main__':
     parser.add_argument('-f', '--folder',                                      help='local folder name [from the date]')
     parser.add_argument('-c', '--channel',                                     help='production channel (list of leptons)')
     parser.add_argument('-T', '--Top',                                         help='number of tops (no restriction)')
-    parser.add_argument('-e', '--email',     default = user,                   help='email address to send to when jobs are done')
+    parser.add_argument('-e', '--email',     default = '" "',                  help='email address to send to when jobs are done')
     parser.add_argument('-n', '--nevents',   default = 1000000,  type = int,   help='number of events to produce')
 
     if "CMSSW_BASE" not in os.environ:
@@ -193,7 +193,7 @@ if __name__ == '__main__':
             'JOB_NAME'        : os.path.basename(genFolder),
             'DEPENDENCY_TEMP' : dependency,
             'CMSSW_BASE_TEMP' : os.environ["CMSSW_BASE"],
-            }
+        }
 
         replaceParameterInFile ('submit_step2.sh', 'gen_' + args.folder + '.sh', substitute_step2)
         execute ('sbatch ./gen_' + args.folder + '.sh')
