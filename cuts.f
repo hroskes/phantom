@@ -634,9 +634,39 @@ c end giuseppe 01/03/2007
       DIMENSION
      &   idp0(6),invord0(8)
 * LOCAL VARIABLES
+      integer :: ntotlept, i, nlept(1:6)
+      real(8) :: ptot(0:3), Q
 
       iuserfunc=0 
        
+
+
+!Heshy: m4l < 170
+        ntotlept=0
+        nlept(:)=0
+        do i=1,6
+          if (abs(idp0(i)).gt.10.and.abs(idp0(i)).lt.17)then
+            ntotlept=ntotlept+1
+            nlept(ntotlept)=i
+          endif
+        enddo
+
+        if (ntotlept.eq.4) then
+
+          ptot(0)=p0(0,nlept(1))+p0(0,nlept(2))
+     &           +p0(0,nlept(3))+p0(0,nlept(4))
+          ptot(1)=p0(1,nlept(1))+p0(1,nlept(2))
+     &           +p0(1,nlept(3))+p0(1,nlept(4))
+          ptot(2)=p0(2,nlept(1))+p0(2,nlept(2))
+     &           +p0(2,nlept(3))+p0(2,nlept(4))
+          ptot(3)=p0(3,nlept(1))+p0(3,nlept(2))
+     &           +p0(3,nlept(3))+p0(3,nlept(4))
+
+          Q=sqrt(ptot0**2-ptot1**2-ptot2**2-ptot3**2)
+
+          if (Q.gt.170d0) RETURN
+        endif
+
 c* ASK FOR MINIMUM TRANSVERSE MOMENTUM OF FOUR CENTRAL PARTICLES
 c      pperpmin=100.d0
 c      px=0.d0
@@ -733,18 +763,22 @@ cccccccccccccccccccccccccc end giuseppe 25/07/2007
 * LOCAL VARIABLES
 
       iuserfuncos=0 
+
+* Heshy: same as IUSERFUNC, why would you want them different?
+*      iuserfuncos=iuserfunc(p0,idp0,eta0,pt0,pmod,rmsq,delphi,deltheta,i_eta_max_j0,eta_max_j0,i_eta_min_j0,eta_min_j0,invord0)
+*      return
        
 * ASK FOR MINIMUM TRANSVERSE MOMENTUM OF FOUR CENTRAL PARTICLES
-      pperpmin=100.d0
-      px=0.d0
-      py=0.d0
-      DO i=1,6
-        IF(i.NE.i_eta_max_j0 .AND. i.NE.i_eta_min_j0) THEN
-          px=px+p0(1,i)
-          py=py+p0(2,i)
-        ENDIF
-      ENDDO
-      IF(sqrt(px*px+py*py).LT.pperpmin) RETURN
+!      pperpmin=100.d0
+!      px=0.d0
+!      py=0.d0
+!      DO i=1,6
+!        IF(i.NE.i_eta_max_j0 .AND. i.NE.i_eta_min_j0) THEN
+!          px=px+p0(1,i)
+!          py=py+p0(2,i)
+!        ENDIF
+!      ENDDO
+!      IF(sqrt(px*px+py*py).LT.pperpmin) RETURN
 
 * IF WE GET HERE ALL USER CUTS HAVE BEEN PASSED
       iuserfuncos=1
